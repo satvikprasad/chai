@@ -7,6 +7,9 @@
 typedef struct Canvas {
     HMM_Vec4 screen_bounds;
 
+	HMM_Vec2 center;
+	HMM_Vec2 canvas_size;
+
     u32 index;
 } Canvas;
 
