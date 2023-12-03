@@ -3,12 +3,9 @@
 #include "defines.h"
 #include "raylib.h"
 #include "renderer.h"
-#include "util.h"
 #include "vendor/HandmadeMath.h"
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <vcruntime_string.h>
 
 static inline void PushCanvas(CState *state, Canvas canvas);
 
@@ -19,7 +16,9 @@ CState *CreateCState(HMM_Vec2 window_size) {
     state->window_size = window_size;
 
     state->canvases = calloc(32, sizeof(Canvas));
-    PushCanvas(state, (Canvas){.screen_bounds = (HMM_Vec4){500, 50, 800, 700}});
+    PushCanvas(state, (Canvas){.screen_bounds = (HMM_Vec4){500, 50, 800, 700},
+			.center={0, 0},
+			.canvas_size={100, 100}});
 
     return state;
 }

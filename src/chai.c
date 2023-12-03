@@ -7,7 +7,7 @@ int main(void) {
 
     InitWindow(state->window_size.Width, state->window_size.Height, "Chai");
 
-    SetTargetFPS(60);
+    SetTargetFPS(144);
 
     while (!WindowShouldClose()) {
         CStateUpdate(state);
