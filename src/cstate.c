@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "raylib.h"
 #include "renderer.h"
+#include "util.h"
 #include "vendor/HandmadeMath.h"
 
 #include <stdlib.h>
@@ -16,9 +17,24 @@ CState *CreateCState(HMM_Vec2 window_size) {
     state->window_size = window_size;
 
     state->canvases = calloc(32, sizeof(Canvas));
-    PushCanvas(state, (Canvas){.screen_bounds = (HMM_Vec4){500, 50, 800, 700},
+    PushCanvas(state, (Canvas){
+			.screen_bounds = (HMM_Vec4){10, 10, state->window_size.Width/2 - 10, 
+			state->window_size.Height - 10},
 			.center={0, 0},
-			.canvas_size={100, 100}});
+			.size={100, 100}});
+    PushCanvas(state, (Canvas){
+			.screen_bounds = (HMM_Vec4){state->window_size.Width/2 + 10, 10, state->window_size.Width - 10, state->window_size.Height - 10},
+			.center={0, 0},
+			.size={100, 100}});
+
+	for (i32 i = 0; i < 1000; ++i) {
+		Canvas *canvas = &state->canvases[0];
+
+		canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
+
+		canvas->lines[canvas->line_count - 1].vertices[0] = (HMM_Vec2){(f32)(i-1)/10, (f32)(i-1)*(f32)(i-1)/10000};
+		canvas->lines[canvas->line_count - 1].vertices[1] = (HMM_Vec2){(f32)i/10, (f32)i*(f32)i/10000};
+	}
 
     return state;
 }
@@ -40,6 +56,11 @@ void CStateRender(CState *state) {
 
         CanvasRender(state, canvas);
     }
+}
+
+void CStateDestroy(CState *state) {
+	free(state->canvases);
+	free(state);
 }
 
 static inline void PushCanvas(CState *state, Canvas canvas) {

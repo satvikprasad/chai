@@ -16,3 +16,5 @@ CState *CreateCState(HMM_Vec2 window_size);
 
 void CStateUpdate(CState *state);
 void CStateRender(CState *state);
+
+void CStateDestroy(CState *state);
