@@ -21,6 +21,7 @@ int main(void) {
     }
 
     CloseWindow();
+	CStateDestroy(state);
 
     return 0;
 }
