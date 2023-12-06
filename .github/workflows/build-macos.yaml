@@ -2,6 +2,7 @@ name: build-macos
 on: [push]
 jobs:
   build:
+    permissions: write-all
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
