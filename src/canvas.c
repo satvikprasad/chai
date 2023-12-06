@@ -8,19 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
-HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
+static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
+static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
+
+static inline void HandleInputs(CState *state, Canvas *canvas);
 
 void CanvasUpdate(CState *state, Canvas *canvas) {
-	canvas->size.Width += 0.6*sin(GetTime());
-	canvas->size.Height += 0.6*sin(GetTime());
-
-	if (IsKeyDown(KEY_A)) {
-		canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
-
-		canvas->lines[canvas->line_count - 1].vertices[0] = (HMM_Vec2){10, 10};
-		canvas->lines[canvas->line_count - 1].vertices[1] = ScreenSpaceToCanvasSpace(state, canvas, state->mouse_pos);
-	}
+	HandleInputs(state, canvas);
 }
 
 void CanvasRender(CState *state, Canvas *canvas) {
@@ -48,7 +42,7 @@ void CanvasRender(CState *state, Canvas *canvas) {
     CDrawRectangleLines(state, canvas->screen_bounds, BLACK);
 }
 
-HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
+static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
 	HMM_Vec2 canvas_screen_size = {canvas->screen_bounds.ZW.X - canvas->screen_bounds.XY.X, 
 		canvas->screen_bounds.ZW.Y - canvas->screen_bounds.XY.Y};
 
@@ -60,7 +54,7 @@ HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
 				2), from_center);
 }
 
-HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
+static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
 	HMM_Vec2 canvas_screen_size = {canvas->screen_bounds.ZW.X - canvas->screen_bounds.XY.X, 
 		canvas->screen_bounds.ZW.Y - canvas->screen_bounds.XY.Y};
 
@@ -71,4 +65,23 @@ HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
 
 
 	return HMM_AddV2(HMM_MulM2V2(scale, from_center), canvas->center);
+}
+
+static inline void HandleInputs(CState *state, Canvas *canvas) {
+	if (IsKeyDown(KEY_A)) {
+		canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
+
+		canvas->lines[canvas->line_count - 1].vertices[0] = (HMM_Vec2){10, 10};
+		canvas->lines[canvas->line_count - 1].vertices[1] = ScreenSpaceToCanvasSpace(state, canvas, state->mouse_pos);
+	}
+
+	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+		HMM_Mat2 scale = {{{
+			canvas->size.Width / (canvas->screen_bounds.ZW.X - canvas->screen_bounds.XY.X), 0
+		}, {
+			0, canvas->size.Height / (canvas->screen_bounds.ZW.Y - canvas->screen_bounds.XY.Y),
+		}}};
+
+		canvas->center = HMM_AddV2(canvas->center, HMM_MulM2V2(scale, HMM_MulV2F(state->mouse_delta, -1)));
+	}
 }

@@ -6,7 +6,9 @@
 
 typedef struct CState {
     HMM_Vec2 window_size;
+
     HMM_Vec2 mouse_pos;
+	HMM_Vec2 mouse_delta;
 
     struct Canvas *canvases;
     u32 canvas_count;
