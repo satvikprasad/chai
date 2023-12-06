@@ -5,9 +5,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-        git submodule update --init --recursive
-        ls lib/raylib
-        ./libs.sh
-        mkdir bin
-        ./build.sh
+      - run: git submodule update --init --recursive
+      - run: ls lib/raylib
+      - run: ./libs.sh
+      - run: mkdir bin
+      - run: ./build.sh
