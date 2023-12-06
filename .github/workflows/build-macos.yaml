@@ -12,7 +12,7 @@ jobs:
       - run: mkdir bin
       - run: ./build.sh
       - name: Create Release
-        id: create-release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
