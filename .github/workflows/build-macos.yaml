@@ -37,4 +37,13 @@ jobs:
         with:
           tag_name: ${{ github.run_number }}
           release_name: chai-windows-v0.0.${{ github.run_number }}
+      - name: Add Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .\bin\chai.exe
+          asset_name: chai-windows-v0.0.${{ github.run_number }}
+          asset_content_type: application
 
