@@ -27,6 +27,5 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./bin/chai
           asset_name: chai-macos-v${{ github.run_number }}
-          asset_content_type: application
 
 
