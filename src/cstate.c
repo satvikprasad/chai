@@ -43,6 +43,9 @@ void CStateUpdate(CState *state) {
     state->mouse_pos.Y = state->window_size.Y - GetMouseY();
     state->mouse_pos.X = GetMouseX();
 
+	state->mouse_delta.X = GetMouseDelta().x;
+	state->mouse_delta.Y = -GetMouseDelta().y;
+
     for (u32 i = 0; i < state->canvas_count; ++i) {
         Canvas *canvas = &state->canvases[i];
 
