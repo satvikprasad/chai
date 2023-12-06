@@ -5,6 +5,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - run: ls lib
       - run: ./libs.sh
       - run: mkdir bin
       - run: ./build.sh
