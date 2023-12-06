@@ -1,9 +1,9 @@
 name: build-macos
 on: [push]
 jobs:
-  build:
+  build-macos:
     permissions: write-all
-    runs-on: macos-13-large
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - run: git submodule update --init --recursive
@@ -19,14 +19,21 @@ jobs:
         with:
           tag_name: ${{ github.run_number }}
           release_name: chai-macos-v0.0.${{ github.run_number }}
-      - name: Add Release Asset
-        uses: actions/upload-release-asset@v1
+  build-windows:
+    permissions: write-all
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --init --recursive
+      - run: ./libs.bat
+      - run: mkdir bin
+      - run: ./build.bat
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/chai
-          asset_name: chai-macos-v0.0.${{ github.run_number }}
-          asset_content_type: application/x-mach-binary
-
+          tag_name: ${{ github.run_number }}
+          release_name: chai-windows-v0.0.${{ github.run_number }}
 
