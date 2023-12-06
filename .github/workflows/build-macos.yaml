@@ -17,7 +17,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }}
+          tag_name: ${{ github.run_number }}-macos
           release_name: chai-macos-v0.0.${{ github.run_number }}
   build-windows:
     permissions: write-all
@@ -36,7 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }}
+          tag_name: ${{ github.run_number }}-windows
           release_name: chai-windows-v0.0.${{ github.run_number }}
       - name: Add Release Asset
         uses: actions/upload-release-asset@v1
