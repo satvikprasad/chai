@@ -25,9 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: git submodule update --init --recursive
-      - run: ./libs.bat
+      - run: .\libs.bat
       - run: mkdir bin
-      - run: ./build.bat
+      - run: .\build.bat
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
