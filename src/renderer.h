@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cstate.h"
 #include "raylib.h"
 #include "vendor/HandmadeMath.h"

@@ -1,2 +1,5 @@
 ./build.sh
-exec bin/chai
+
+cd bin
+exec ./chai
+cd ../

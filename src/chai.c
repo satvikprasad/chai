@@ -1,5 +1,7 @@
 #include "cstate.h"
 #include "raylib.h"
+#include "scripting.h"
+#include "util.h"
 #include "vendor/HandmadeMath.h"
 
 int main(void) {
@@ -9,12 +11,18 @@ int main(void) {
 
     SetTargetFPS(144);
 
+	InitialiseScripting(state);
+
+	ScriptingConfigure(state);
+
+	PrintVec4(state->bg_color);
+
     while (!WindowShouldClose()) {
         CStateUpdate(state);
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground((Color){state->bg_color.R, state->bg_color.G, state->bg_color.B, state->bg_color.A});
         CStateRender(state);
 
         EndDrawing();
