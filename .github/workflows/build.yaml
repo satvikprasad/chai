@@ -6,10 +6,11 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
-      - run: git submodule update --init --recursive
-      - run: ./libs.sh
-      - run: mkdir bin
-      - run: ./build.sh
+      - name: Build
+        run: git submodule update --init --recursive
+        run: ./libs.sh
+        run: mkdir bin
+        run: ./build.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -24,10 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
-      - run: git submodule update --init --recursive
-      - run: .\libs.bat
-      - run: mkdir bin
-      - run: .\build.bat
+      - name: Build
+        run: git submodule update --init --recursive
+        run: .\libs.bat
+        run: mkdir bin
+        run: .\build.bat
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
