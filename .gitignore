@@ -3,3 +3,7 @@
 bin/
 .compile_flags.txt
 .DS_Store
+*.o
+*.a
+lib/lua/src/lua
+lib/lua/src/luac
