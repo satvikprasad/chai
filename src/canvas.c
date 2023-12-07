@@ -84,12 +84,4 @@ static inline void HandleInputs(CState *state, Canvas *canvas) {
 
 		canvas->center = HMM_AddV2(canvas->center, HMM_MulM2V2(scale, HMM_MulV2F(state->mouse_delta, -1)));
 	}
-
-	if (IsKeyDown(KEY_LEFT_CONTROL)) {
-		canvas->size.X -= GetMouseWheelMove();
-	}
-
-	if (IsKeyDown(KEY_LEFT_SHIFT)) {
-		canvas->size.Y -= GetMouseWheelMove();
-	}
 }

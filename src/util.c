@@ -3,8 +3,6 @@
 #include <stdio.h>
 
 void PrintVec2(HMM_Vec2 vec) { printf("(%f, %f)\n", vec.X, vec.Y); }
-void PrintVec3(HMM_Vec3 vec) { printf("(%f, %f, %f)\n", vec.X, vec.Y, vec.Z); }
-void PrintVec4(HMM_Vec4 vec) { printf("(%f, %f, %f, %f)\n", vec.X, vec.Y, vec.Z, vec.W); }
 
 HMM_Vec2 ClampV2ToBounds(HMM_Vec2 vec, HMM_Vec4 bounds) {
 	if(vec.X <= bounds.XY.X) {
