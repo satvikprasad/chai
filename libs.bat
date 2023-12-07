@@ -6,6 +6,6 @@ cd ../../../
 
 cd lib/lua
 
-make 
+make PLAT=mingw
 
 cd ../../
