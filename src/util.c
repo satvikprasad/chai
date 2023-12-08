@@ -1,3 +1,4 @@
+#include "cstate.h"
 #include "defines.h"
 #include "vendor/HandmadeMath.h"
 #include <stdio.h>
@@ -21,4 +22,12 @@ HMM_Vec2 ClampV2ToBounds(HMM_Vec2 vec, HMM_Vec4 bounds) {
 	}
 
 	return vec;
+}
+
+void DumpProcedures(CState *state) {
+	for (u32 i = 0; i < state->procedure_count; ++i) {
+		Procedure proc = state->procedures[i];
+
+		printf("Procedure %u: (%s, %s)\n", i, proc.func, proc.name);
+	}
 }
