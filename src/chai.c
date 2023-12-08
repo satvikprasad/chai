@@ -1,8 +1,8 @@
 #include "cstate.h"
 #include "raylib.h"
 #include "scripting.h"
-#include "util.h"
 #include "vendor/HandmadeMath.h"
+#include <stdio.h>
 
 int main(void) {
     CState *state = CreateCState((HMM_Vec2){1280, 720});
@@ -12,10 +12,7 @@ int main(void) {
     SetTargetFPS(144);
 
 	InitialiseScripting(state);
-
 	ScriptingConfigure(state);
-
-	PrintVec4(state->bg_color);
 
     while (!WindowShouldClose()) {
         CStateUpdate(state);
@@ -27,6 +24,12 @@ int main(void) {
 
         EndDrawing();
     }
+
+	for (u32 i = 0; i < state->procedure_count; ++i) {
+		Procedure proc = state->procedures[i];
+
+		printf("Procedure %u: (%s, %s)\n", i, proc.func, proc.name);
+	}
 
     CloseWindow();
 	CStateDestroy(state);
