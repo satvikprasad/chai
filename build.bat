@@ -6,5 +6,5 @@ SET linker=lib\raylib\src\libraylib.a lib\lua\src\liblua.a -lgdi32 -lole32 -lole
 gcc src\*.c -o bin\chai %include% %linker%
 
 mkdir .\bin\assets
-robocopy .\assets .\bin\assets /E
+xcopy .\assets .\bin\assets /S /E /H
 
