@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
 static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
@@ -18,6 +19,7 @@ void CanvasUpdate(CState *state, Canvas *canvas) {
 }
 
 void CanvasRender(CState *state, Canvas *canvas) {
+    CDrawRectangle(state, canvas->screen_bounds, GRAY);
 
 	HMM_Vec4 bounds;
 	bounds.XY = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){0, 0}), 
@@ -39,7 +41,16 @@ void CanvasRender(CState *state, Canvas *canvas) {
 		CDrawLineInBounds(state, screen_vertices, canvas->screen_bounds, BLACK);
 	}
 
-    CDrawRectangleLines(state, canvas->screen_bounds, BLACK);
+	Color color = BLACK;
+	if (canvas->index == state->selected_canvas) color = RED;
+
+    CDrawRectangleLines(state, canvas->screen_bounds, color);
+}
+
+void CanvasAddLine(Canvas *canvas, HMM_Vec2 vertices[2]) {
+	canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
+
+	memcpy(canvas->lines[canvas->line_count -1].vertices, vertices, sizeof(HMM_Vec2)*2);
 }
 
 static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
@@ -68,11 +79,15 @@ static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, H
 }
 
 static inline void HandleInputs(CState *state, Canvas *canvas) {
-	if (IsKeyDown(KEY_A)) {
-		canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
+	if (canvas->index != state->selected_canvas) {
+		if (V2InBounds(state->mouse_pos, canvas->screen_bounds) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			state->selected_canvas = canvas->index;
+		} 
+		return;
+	}
 
-		canvas->lines[canvas->line_count - 1].vertices[0] = (HMM_Vec2){10, 10};
-		canvas->lines[canvas->line_count - 1].vertices[1] = ScreenSpaceToCanvasSpace(state, canvas, state->mouse_pos);
+	if (IsKeyDown(KEY_A)) {
+		CanvasAddLine(canvas, (HMM_Vec2[2]){(HMM_Vec2){10, 10}, ScreenSpaceToCanvasSpace(state, canvas, state->mouse_pos)});
 	}
 
 	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
@@ -93,3 +108,4 @@ static inline void HandleInputs(CState *state, Canvas *canvas) {
 		canvas->size.Y -= GetMouseWheelMove();
 	}
 }
+

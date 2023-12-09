@@ -22,3 +22,4 @@ typedef struct Canvas {
 
 void CanvasRender(CState *state, Canvas *canvas);
 void CanvasUpdate(CState *state, Canvas *canvas);
+void CanvasAddLine(Canvas *canvas, HMM_Vec2 vertices[2]);

@@ -5,7 +5,14 @@
 #include "raylib.h"
 #include "vendor/HandmadeMath.h"
 
+typedef struct Procedure {
+	i32 func;
+	char *name;
+} Procedure;
+
 typedef struct CState {
+	Font font;
+
     HMM_Vec2 window_size;
 
 	HMM_Vec4 bg_color;
@@ -15,6 +22,12 @@ typedef struct CState {
 
     struct Canvas *canvases;
     u32 canvas_count;
+	u32 selected_canvas;
+
+	i32 proc_table;
+
+	Procedure *procedures;
+	u32 procedure_count;
 
 	lua_State *lua;
 } CState;
