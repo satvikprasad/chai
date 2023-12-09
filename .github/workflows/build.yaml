@@ -32,10 +32,7 @@ jobs:
           .\libs.bat
           mkdir bin
           .\build.bat
-      - name: Zip Build
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r bin.zip bin
+          Compress-Archive -Path bin/* -Destination bin.zip
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
