@@ -68,6 +68,10 @@ static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, H
 }
 
 static inline void HandleInputs(CState *state, Canvas *canvas) {
+	if (!V2InBounds(state->mouse_pos, canvas->screen_bounds)) {
+		return;
+	}
+
 	if (IsKeyDown(KEY_A)) {
 		canvas->lines = realloc(canvas->lines, sizeof(CanvasLine)*++canvas->line_count);
 

@@ -8,5 +8,6 @@ void PrintVec3(HMM_Vec3 vec);
 void PrintVec4(HMM_Vec4 vec);
 
 HMM_Vec2 ClampV2ToBounds(HMM_Vec2 vec, HMM_Vec4 bounds);
+b8 V2InBounds(HMM_Vec2 vec, HMM_Vec4 bounds);
 
 void DumpProcedures(CState *state);

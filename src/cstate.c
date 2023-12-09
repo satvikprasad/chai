@@ -1,11 +1,14 @@
 #include "cstate.h"
 #include "canvas.h"
 #include "defines.h"
+#include "lua.h"
 #include "raylib.h"
 #include "renderer.h"
+#include "scripting.h"
 #include "util.h"
 #include "vendor/HandmadeMath.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 static inline void PushCanvas(CState *state, Canvas canvas);
@@ -40,17 +43,24 @@ CState *CreateCState(HMM_Vec2 window_size) {
 }
 
 void CStateUpdate(CState *state) {
-    state->mouse_pos.Y = state->window_size.Y - GetMouseY();
-    state->mouse_pos.X = GetMouseX();
-
-	state->mouse_delta.X = GetMouseDelta().x;
-	state->mouse_delta.Y = -GetMouseDelta().y;
+    state->mouse_pos = (HMM_Vec2){GetMouseX(), state->window_size.Y - GetMouseY()};
+	state->mouse_delta = (HMM_Vec2){GetMouseDelta().x, -GetMouseDelta().y};
 
     for (u32 i = 0; i < state->canvas_count; ++i) {
         Canvas *canvas = &state->canvases[i];
 
         CanvasUpdate(state, canvas);
     }
+
+	for (u32 i = 0; i < state->procedure_count; ++i) {
+		Procedure *proc = &state->procedures[i];
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && V2InBounds(state->mouse_pos, (HMM_Vec4){45, 20 + 20*i - 13, 50 + 100, 23 + 20*i})) {
+			ScriptingPushFunc(state, proc->func);
+			lua_call(state->lua, 0, 0);
+		}
+	}
+
 }
 
 void CStateRender(CState *state) {
@@ -59,6 +69,20 @@ void CStateRender(CState *state) {
 
         CanvasRender(state, canvas);
     }
+
+	for (u32 i = 0; i < state->procedure_count; ++i) {
+		Procedure *proc = &state->procedures[i];
+
+		HMM_Vec4 bounds = {45, 20 + 20*i - 13, 50 + 100, 23 + 20*i};
+		Color color = WHITE;
+
+		if (V2InBounds(state->mouse_pos, bounds)) {
+			color = RED;
+		}
+
+		CDrawText(state, (HMM_Vec2){50, 20 + 20*i}, proc->name, 14, WHITE);
+		CDrawRectangleLines(state, bounds, color);
+	}
 }
 
 void CStateDestroy(CState *state) {

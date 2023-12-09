@@ -11,6 +11,8 @@ typedef struct Procedure {
 } Procedure;
 
 typedef struct CState {
+	Font font;
+
     HMM_Vec2 window_size;
 
 	HMM_Vec4 bg_color;

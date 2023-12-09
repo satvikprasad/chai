@@ -79,6 +79,10 @@ void CDrawLineInBounds(CState *state, HMM_Vec2 vertices[2], HMM_Vec4 bounds, Col
 
 void CDrawRectangleLines(CState *state, HMM_Vec4 bounds, Color color) {
 	DrawRectangleLines(bounds.XY.X, state->window_size.Y - bounds.ZW.Y, bounds.ZW.X - bounds.XY.X,
-			bounds.ZW.Y - bounds.XY.Y, BLACK);
+			bounds.ZW.Y - bounds.XY.Y, color);
 }
 
+
+void CDrawText(CState *state, HMM_Vec2 position, const char *text, u32 font_size, Color color) {
+	DrawTextEx(state->font, text, (Vector2){position.X, state->window_size.Height - position.Y}, font_size, 1, color);
+}

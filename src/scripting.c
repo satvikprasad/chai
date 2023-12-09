@@ -63,6 +63,10 @@ void ScriptingDestroy(CState *state) {
 	lua_close(state->lua);
 }
 
+void ScriptingPushFunc(CState *state, const char *func) {
+	lua_getglobal(state->lua, func);
+}
+
 void ScriptingPushCState(CState *state) {
 	u32 bytes = sizeof(CState *);
 	CState **p_state = (CState **)lua_newuserdata(state->lua, bytes);
