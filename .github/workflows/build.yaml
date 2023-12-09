@@ -32,6 +32,10 @@ jobs:
           .\libs.bat
           mkdir bin
           .\build.bat
+      - name: Zip Build
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r bin.zip bin
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -42,9 +46,6 @@ jobs:
           release_name: chai-windows-v0.0.${{ github.run_number }}
       - name: Add Release Asset
         uses: actions/upload-release-asset@v1
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r bin.zip bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
