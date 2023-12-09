@@ -80,6 +80,34 @@ void ScriptingPushCState(CState *state) {
 	*p_state = state;
 }
 
+HMM_Vec2 *ScriptingPopVertices(lua_State *L, u32 *vertex_count) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+
+	lua_geti(L, -1, 2);
+	*vertex_count = (u32)lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	HMM_Vec2 *vertices = calloc(*vertex_count, sizeof(HMM_Vec2));
+
+	lua_geti(L, -1, 1);
+	for (u32 i = 1; i <= *vertex_count; ++i) {
+		lua_rawgeti(L, -1, i);
+		{
+			lua_rawgeti(L, -1, 1);
+			vertices[i-1].X = lua_tonumber(L, -1);
+			lua_pop(L, 1);
+
+			lua_rawgeti(L, -1, 2);
+			vertices[i-1].Y = lua_tonumber(L, -1);
+			lua_pop(L, 1);
+		}
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
+
+	return vertices;
+}
+
 static inline HMM_Vec4 DecodeTableV4(lua_State *lua) {
 	HMM_Vec4 vec;
 

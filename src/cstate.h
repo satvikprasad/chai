@@ -22,8 +22,9 @@ typedef struct CState {
 
     struct Canvas *canvases;
     u32 canvas_count;
+	u32 selected_canvas;
 
-	int proc_table;
+	i32 proc_table;
 
 	Procedure *procedures;
 	u32 procedure_count;

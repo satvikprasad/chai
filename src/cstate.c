@@ -22,11 +22,13 @@ CState *CreateCState(HMM_Vec2 window_size) {
 
     state->canvases = calloc(32, sizeof(Canvas));
     PushCanvas(state, (Canvas){
+			.index = 0,
 			.screen_bounds = (HMM_Vec4){10, 10, state->window_size.Width/2 - 10, 
 			state->window_size.Height - 10},
 			.center={0, 0},
 			.size={100, 100}});
     PushCanvas(state, (Canvas){
+			.index = 1,
 			.screen_bounds = (HMM_Vec4){state->window_size.Width/2 + 10, 10, state->window_size.Width - 10, state->window_size.Height - 10},
 			.center={0, 0},
 			.size={100, 100}});
@@ -56,16 +58,20 @@ void CStateUpdate(CState *state) {
 	for (u32 i = 0; i < state->procedure_count; ++i) {
 		Procedure *proc = &state->procedures[i];
 
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && V2InBounds(state->mouse_pos, (HMM_Vec4){45, 20 + 20*i - 13, 50 + 100, 23 + 20*i})) {
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && V2InBounds(state->mouse_pos, (HMM_Vec4){45, 20 + 20*i - 13, 50 + 100, 23 + 20*i})) {
 			lua_rawgeti(state->lua, LUA_REGISTRYINDEX, proc->func);
 
-			lua_pushvalue(state->lua, 1);
+			lua_call(state->lua, 0, 1);
 
-			if (0 != lua_pcall(state->lua, 0, 0, 0)) {
-				printf("%s\n", lua_tostring(state->lua, -1));
+			u32 vertex_count;
+			HMM_Vec2 *vertices = ScriptingPopVertices(state->lua, &vertex_count);
+
+			for (u32 i = 1; i < vertex_count; ++i) {
+				CanvasAddLine(&state->canvases[state->selected_canvas], (HMM_Vec2[2]){
+					vertices[i-1],
+					vertices[i]
+				});
 			}
-
-			proc->func = luaL_ref(state->lua, LUA_REGISTRYINDEX);
 		}
 	}
 
@@ -94,7 +100,24 @@ void CStateRender(CState *state) {
 }
 
 void CStateDestroy(CState *state) {
+	for (u32 i = 0; i < state->canvas_count; ++i) {
+		Canvas *canvas = &state->canvases[i];
+
+		free(canvas->lines);
+	}
+
 	free(state->canvases);
+
+	for (u32 i = 0; i < state->procedure_count; ++i) {
+		Procedure *proc = &state->procedures[i];
+
+		free(proc->name);
+
+		luaL_unref(state->lua, LUA_REGISTRYINDEX, proc->func);
+	}
+
+	free(state->procedures);
+
 	free(state);
 }
 

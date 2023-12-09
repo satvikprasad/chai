@@ -8,7 +8,7 @@ void CDrawRectangle(CState *state, HMM_Vec4 bounds, Color color) {
 
 	DrawRectangleRec((Rectangle){bounds.XY.X, state->window_size.Y - bounds.ZW.Y,
 			bounds.ZW.X - bounds.XY.X, bounds.ZW.Y - bounds.XY.Y},
-			BLACK);
+			color);
 }
 
 void CDrawLine(CState *state, HMM_Vec2 vertices[2], Color color) {
