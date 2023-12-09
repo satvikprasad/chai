@@ -45,6 +45,6 @@ void DumpProcedures(CState *state) {
 	for (u32 i = 0; i < state->procedure_count; ++i) {
 		Procedure proc = state->procedures[i];
 
-		printf("Procedure %u: (%s, %s)\n", i, proc.func, proc.name);
+		printf("Procedure %u: %s\n", i, proc.name);
 	}
 }

@@ -6,7 +6,7 @@
 #include "vendor/HandmadeMath.h"
 
 typedef struct Procedure {
-	char *func;
+	i32 func;
 	char *name;
 } Procedure;
 
@@ -22,6 +22,8 @@ typedef struct CState {
 
     struct Canvas *canvases;
     u32 canvas_count;
+
+	int proc_table;
 
 	Procedure *procedures;
 	u32 procedure_count;

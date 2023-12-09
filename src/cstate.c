@@ -1,6 +1,7 @@
 #include "cstate.h"
 #include "canvas.h"
 #include "defines.h"
+#include "lauxlib.h"
 #include "lua.h"
 #include "raylib.h"
 #include "renderer.h"
@@ -56,8 +57,15 @@ void CStateUpdate(CState *state) {
 		Procedure *proc = &state->procedures[i];
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && V2InBounds(state->mouse_pos, (HMM_Vec4){45, 20 + 20*i - 13, 50 + 100, 23 + 20*i})) {
-			ScriptingPushFunc(state, proc->func);
-			lua_call(state->lua, 0, 0);
+			lua_rawgeti(state->lua, LUA_REGISTRYINDEX, proc->func);
+
+			lua_pushvalue(state->lua, 1);
+
+			if (0 != lua_pcall(state->lua, 0, 0, 0)) {
+				printf("%s\n", lua_tostring(state->lua, -1));
+			}
+
+			proc->func = luaL_ref(state->lua, LUA_REGISTRYINDEX);
 		}
 	}
 

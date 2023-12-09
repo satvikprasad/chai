@@ -36,7 +36,10 @@ void InitialiseScripting(CState *state) {
 	}
 	lua_setglobal(state->lua, "Chai");
 
-	luaL_dofile(state->lua, "./lua/chai.lua");
+	if(0 != luaL_dofile(state->lua, "./lua/chai.lua")) {
+		printf("Failed to load chai.lua!\n %s\n", lua_tostring(state->lua, -1));
+		lua_close(state->lua);
+	}
 }
 
 void ScriptingConfigure(CState *state) {
@@ -56,7 +59,11 @@ void ScriptingConfigure(CState *state) {
 
 			state->bg_color = DecodeTableV4(state->lua);
 		}
+
+		lua_pop(state->lua, 1);
 	}
+
+	lua_pop(state->lua, 1);
 }
 
 void ScriptingDestroy(CState *state) {
@@ -87,19 +94,17 @@ static inline HMM_Vec4 DecodeTableV4(lua_State *lua) {
 }
 
 static int AddProcedure(lua_State *L) {
-	CState *state = *((CState **)lua_touserdata(L, 1));
+	int func = luaL_ref(L, LUA_REGISTRYINDEX);
+	const char *name = lua_tostring(L, -1);
 
-	const char *func = lua_tostring(L, 2);
-	const char *name = lua_tostring(L, 3);
-	
+	CState *state = *((CState **)lua_touserdata(L, -2));
+
 	state->procedures = realloc(state->procedures, sizeof(Procedure) * ++state->procedure_count);
 	Procedure *proc = &state->procedures[state->procedure_count-1];
 
-	proc->func = malloc(sizeof(char) * strlen(func));
+	proc->func = func;
 	proc->name = malloc(sizeof(char) * strlen(name));
-
-	strcpy(proc->func, func);
 	strcpy(proc->name, name);
 
-	return 0;	
+	return 0;
 }
