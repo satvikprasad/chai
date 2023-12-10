@@ -59,9 +59,7 @@ void CStateUpdate(CState *state) {
 		Procedure *proc = &state->procedures[i];
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && V2InBounds(state->mouse_pos, (HMM_Vec4){45, 20 + 20*i - 13, 50 + 100, 23 + 20*i})) {
-			lua_rawgeti(state->lua, LUA_REGISTRYINDEX, proc->func);
-
-			lua_call(state->lua, 0, 1);
+			ScriptingExecFuncReg(state->lua, proc->func, 0, 1);
 
 			u32 vertex_count;
 			HMM_Vec2 *vertices = ScriptingPopVertices(state->lua, &vertex_count);
@@ -75,6 +73,11 @@ void CStateUpdate(CState *state) {
 		}
 	}
 
+	for (u32 i = 0; i < RegisteredEventTypeCount; ++i) {
+		if (state->event_registry[i].registered) {
+			ScriptingExecFuncReg(state->lua, state->event_registry[i].func, 0, 0);
+		}
+	}
 }
 
 void CStateRender(CState *state) {

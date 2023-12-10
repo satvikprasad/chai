@@ -19,7 +19,7 @@ void CanvasUpdate(CState *state, Canvas *canvas) {
 }
 
 void CanvasRender(CState *state, Canvas *canvas) {
-    CDrawRectangle(state, canvas->screen_bounds, GRAY);
+    CDrawRectangle(state, canvas->screen_bounds, RAYWHITE);
 
 	HMM_Vec4 bounds;
 	bounds.XY = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){0, 0}), 

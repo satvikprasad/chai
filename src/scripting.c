@@ -6,6 +6,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,7 @@
 static inline HMM_Vec4 DecodeTableV4(lua_State *lua);
 
 static inline int AddProcedure(lua_State *L);
+static inline int RegisterEvent(lua_State *L);
 
 void InitialiseScripting(CState *state) {
 	char buf[256];
@@ -21,13 +23,21 @@ void InitialiseScripting(CState *state) {
 
 	lua_newtable(state->lua);
 	{
-		lua_pushstring(state->lua, "procedures");
+		lua_pushstring(state->lua, "event_types");
 		lua_newtable(state->lua);
 		{
-			lua_pushstring(state->lua, "add");
-			lua_pushcfunction(state->lua, AddProcedure);
+			lua_pushstring(state->lua, "update");
+			lua_pushnumber(state->lua, RegisteredEventType_UPDATE);
 			lua_settable(state->lua, -3);
 		}
+		lua_settable(state->lua, -3);
+
+		lua_pushstring(state->lua, "register_event");
+		lua_pushcfunction(state->lua, RegisterEvent);
+		lua_settable(state->lua, -3);
+
+		lua_pushstring(state->lua, "add_proc");
+		lua_pushcfunction(state->lua, AddProcedure);
 		lua_settable(state->lua, -3);
 
 		lua_pushstring(state->lua, "state");
@@ -108,6 +118,12 @@ HMM_Vec2 *ScriptingPopVertices(lua_State *L, u32 *vertex_count) {
 	return vertices;
 }
 
+void ScriptingExecFuncReg(lua_State *L, i32 func, i32 nargs, i32 nret) {
+	lua_rawgeti(L, LUA_REGISTRYINDEX, func);
+
+	lua_call(L, nargs, nret);
+}
+
 static inline HMM_Vec4 DecodeTableV4(lua_State *lua) {
 	HMM_Vec4 vec;
 
@@ -133,6 +149,18 @@ static int AddProcedure(lua_State *L) {
 	proc->func = func;
 	proc->name = malloc(sizeof(char) * strlen(name));
 	strcpy(proc->name, name);
+
+	return 0;
+}
+
+static int RegisterEvent(lua_State *L) {
+	int func = luaL_ref(L, LUA_REGISTRYINDEX);
+
+	CState *state = *((CState **)lua_touserdata(L, -2));
+	RegisteredEventType type = lua_tonumber(L, -1);
+
+	state->event_registry[type].registered = true;
+	state->event_registry[type].func = func;
 
 	return 0;
 }
