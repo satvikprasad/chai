@@ -1,4 +1,4 @@
-#include "cstate.h"
+#include "appstate.h"
 #include "defines.h"
 #include "vendor/HandmadeMath.h"
 #include <stdio.h>
@@ -41,7 +41,7 @@ b8 V2InBounds(HMM_Vec2 vec, HMM_Vec4 bounds) {
 	return true;
 }
 
-void DumpProcedures(CState *state) {
+void DumpProcedures(AppState *state) {
 	for (u32 i = 0; i < state->procedure_count; ++i) {
 		Procedure proc = state->procedures[i];
 

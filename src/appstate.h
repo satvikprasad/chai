@@ -16,7 +16,7 @@ typedef enum {
 	RegisteredEventTypeCount,
 } RegisteredEventType;
 
-typedef struct CState {
+typedef struct AppState {
 	Font font;
 
     HMM_Vec2 window_size;
@@ -39,12 +39,4 @@ typedef struct CState {
 		i32 func;
 		b8 registered;
 	} event_registry[8];
-} CState;
-
-CState *CreateCState(HMM_Vec2 window_size);
-
-void CStateUpdate(CState *state);
-void CStateRender(CState *state);
-
-void CStateDestroy(CState *state);
-
+} AppState;

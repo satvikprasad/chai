@@ -1,5 +1,5 @@
 #include "scripting.h"
-#include "cstate.h"
+#include "appstate.h"
 #include "util.h"
 #include "vendor/HandmadeMath.h"
 
@@ -16,7 +16,7 @@ static inline HMM_Vec4 DecodeTableV4(lua_State *lua);
 static inline int AddProcedure(lua_State *L);
 static inline int RegisterEvent(lua_State *L);
 
-void InitialiseScripting(CState *state) {
+void InitialiseScripting(AppState *state) {
 	char buf[256];
 	state->lua = luaL_newstate();
 	luaL_openlibs(state->lua);
@@ -41,7 +41,7 @@ void InitialiseScripting(CState *state) {
 		lua_settable(state->lua, -3);
 
 		lua_pushstring(state->lua, "state");
-		ScriptingPushCState(state);
+		ScriptingPushAppState(state);
 		lua_settable(state->lua, -3);
 	}
 	lua_setglobal(state->lua, "Chai");
@@ -52,7 +52,7 @@ void InitialiseScripting(CState *state) {
 	}
 }
 
-void ScriptingConfigure(CState *state) {
+void ScriptingConfigure(AppState *state) {
 	lua_getglobal(state->lua, "Chai");
 	if (!lua_istable(state->lua, -1)) {
 		printf("Can't find table 'Chai'\n");
@@ -76,17 +76,17 @@ void ScriptingConfigure(CState *state) {
 	lua_pop(state->lua, 1);
 }
 
-void ScriptingDestroy(CState *state) {
+void ScriptingDestroy(AppState *state) {
 	lua_close(state->lua);
 }
 
-void ScriptingPushFunc(CState *state, const char *func) {
+void ScriptingPushFunc(AppState *state, const char *func) {
 	lua_getglobal(state->lua, func);
 }
 
-void ScriptingPushCState(CState *state) {
-	u32 bytes = sizeof(CState *);
-	CState **p_state = (CState **)lua_newuserdata(state->lua, bytes);
+void ScriptingPushAppState(AppState *state) {
+	u32 bytes = sizeof(AppState *);
+	AppState **p_state = (AppState **)lua_newuserdata(state->lua, bytes);
 	*p_state = state;
 }
 
@@ -141,7 +141,7 @@ static int AddProcedure(lua_State *L) {
 	int func = luaL_ref(L, LUA_REGISTRYINDEX);
 	const char *name = lua_tostring(L, -1);
 
-	CState *state = *((CState **)lua_touserdata(L, -2));
+	AppState *state = *((AppState **)lua_touserdata(L, -2));
 
 	state->procedures = realloc(state->procedures, sizeof(Procedure) * ++state->procedure_count);
 	Procedure *proc = &state->procedures[state->procedure_count-1];
@@ -156,7 +156,7 @@ static int AddProcedure(lua_State *L) {
 static int RegisterEvent(lua_State *L) {
 	int func = luaL_ref(L, LUA_REGISTRYINDEX);
 
-	CState *state = *((CState **)lua_touserdata(L, -2));
+	AppState *state = *((AppState **)lua_touserdata(L, -2));
 	RegisteredEventType type = lua_tonumber(L, -1);
 
 	state->event_registry[type].registered = true;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cstate.h"
+#include "appstate.h"
 #include "defines.h"
 #include "vendor/HandmadeMath.h"
 
@@ -20,6 +20,6 @@ typedef struct Canvas {
     u32 index;
 } Canvas;
 
-void CanvasRender(CState *state, Canvas *canvas);
-void CanvasUpdate(CState *state, Canvas *canvas);
+void CanvasRender(AppState *state, Canvas *canvas);
+void CanvasUpdate(AppState *state, Canvas *canvas);
 void CanvasAddLine(Canvas *canvas, HMM_Vec2 vertices[2]);

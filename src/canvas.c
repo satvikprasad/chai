@@ -3,22 +3,19 @@
 #include "raylib.h"
 #include "util.h"
 #include "vendor/HandmadeMath.h"
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
-static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec);
+static inline HMM_Vec2 ScreenSpaceToCanvasSpace(AppState *state, Canvas *canvas, HMM_Vec2 vec);
+static inline HMM_Vec2 CanvasSpaceToScreenSpace(AppState *state, Canvas *canvas, HMM_Vec2 vec);
 
-static inline void HandleInputs(CState *state, Canvas *canvas);
+static inline void HandleInputs(AppState *state, Canvas *canvas);
 
-void CanvasUpdate(CState *state, Canvas *canvas) {
+void CanvasUpdate(AppState *state, Canvas *canvas) {
 	HandleInputs(state, canvas);
 }
 
-void CanvasRender(CState *state, Canvas *canvas) {
+void CanvasRender(AppState *state, Canvas *canvas) {
     CDrawRectangle(state, canvas->screen_bounds, RAYWHITE);
 
 	HMM_Vec4 bounds;
@@ -53,7 +50,7 @@ void CanvasAddLine(Canvas *canvas, HMM_Vec2 vertices[2]) {
 	memcpy(canvas->lines[canvas->line_count -1].vertices, vertices, sizeof(HMM_Vec2)*2);
 }
 
-static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
+static inline HMM_Vec2 CanvasSpaceToScreenSpace(AppState *state, Canvas *canvas, HMM_Vec2 vec) {
 	HMM_Vec2 canvas_screen_size = {canvas->screen_bounds.ZW.X - canvas->screen_bounds.XY.X, 
 		canvas->screen_bounds.ZW.Y - canvas->screen_bounds.XY.Y};
 
@@ -65,7 +62,7 @@ static inline HMM_Vec2 CanvasSpaceToScreenSpace(CState *state, Canvas *canvas, H
 				2), from_center);
 }
 
-static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, HMM_Vec2 vec) {
+static inline HMM_Vec2 ScreenSpaceToCanvasSpace(AppState *state, Canvas *canvas, HMM_Vec2 vec) {
 	HMM_Vec2 canvas_screen_size = {canvas->screen_bounds.ZW.X - canvas->screen_bounds.XY.X, 
 		canvas->screen_bounds.ZW.Y - canvas->screen_bounds.XY.Y};
 
@@ -78,7 +75,7 @@ static inline HMM_Vec2 ScreenSpaceToCanvasSpace(CState *state, Canvas *canvas, H
 	return HMM_AddV2(HMM_MulM2V2(scale, from_center), canvas->center);
 }
 
-static inline void HandleInputs(CState *state, Canvas *canvas) {
+static inline void HandleInputs(AppState *state, Canvas *canvas) {
 	if (canvas->index != state->selected_canvas) {
 		if (V2InBounds(state->mouse_pos, canvas->screen_bounds) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			state->selected_canvas = canvas->index;
