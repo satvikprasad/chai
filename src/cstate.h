@@ -10,6 +10,12 @@ typedef struct Procedure {
 	char *name;
 } Procedure;
 
+typedef enum {
+	RegisteredEventType_UPDATE = 0,
+	RegisteredEventType_RENDER,
+	RegisteredEventTypeCount,
+} RegisteredEventType;
+
 typedef struct CState {
 	Font font;
 
@@ -24,12 +30,15 @@ typedef struct CState {
     u32 canvas_count;
 	u32 selected_canvas;
 
-	i32 proc_table;
-
 	Procedure *procedures;
 	u32 procedure_count;
 
 	lua_State *lua;
+
+	struct {
+		i32 func;
+		b8 registered;
+	} event_registry[8];
 } CState;
 
 CState *CreateCState(HMM_Vec2 window_size);
@@ -38,3 +47,4 @@ void CStateUpdate(CState *state);
 void CStateRender(CState *state);
 
 void CStateDestroy(CState *state);
+
