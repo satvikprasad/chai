@@ -41,6 +41,10 @@ b8 V2InBounds(HMM_Vec2 vec, HMM_Vec4 bounds) {
 	return true;
 }
 
+i32 FloorToI32(i32 i, i32 to) {
+	return i - i%to;
+}
+
 void DumpProcedures(AppState *state) {
 	for (u32 i = 0; i < state->procedure_count; ++i) {
 		Procedure proc = state->procedures[i];

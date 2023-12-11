@@ -9,9 +9,10 @@
 #include <stdlib.h>
 
 static inline AppState *CreateAppState(HMM_Vec2 window_size);
-static inline void AppStateUpdate(AppState *state);
-static inline void AppStateRender(AppState *state);
 static inline void AppStateDestroy(AppState *state);
+
+static inline void Update(AppState *state);
+static inline void Render(AppState *state);
 static inline void PushCanvas(AppState *state, Canvas canvas);
 
 static inline void LoadFonts(AppState *state) {
@@ -33,12 +34,12 @@ int main(void) {
 	ScriptingConfigure(state);
 
     while (!WindowShouldClose()) {
-        AppStateUpdate(state);
+        Update(state);
 
         BeginDrawing();
 
         ClearBackground((Color){state->bg_color.R, state->bg_color.G, state->bg_color.B, state->bg_color.A});
-        AppStateRender(state);
+        Render(state);
 
         EndDrawing();
     }
@@ -82,7 +83,7 @@ static inline AppState *CreateAppState(HMM_Vec2 window_size) {
     return state;
 }
 
-static inline void AppStateUpdate(AppState *state) {
+static inline void Update(AppState *state) {
     state->mouse_pos = (HMM_Vec2){GetMouseX(), state->window_size.Y - GetMouseY()};
 	state->mouse_delta = (HMM_Vec2){GetMouseDelta().x, -GetMouseDelta().y};
 
@@ -117,7 +118,7 @@ static inline void AppStateUpdate(AppState *state) {
 	}
 }
 
-static inline void AppStateRender(AppState *state) {
+static inline void Render(AppState *state) {
     for (u32 i = 0; i < state->canvas_count; ++i) {
         Canvas *canvas = &state->canvases[i];
 
@@ -128,13 +129,13 @@ static inline void AppStateRender(AppState *state) {
 		Procedure *proc = &state->procedures[i];
 
 		HMM_Vec4 bounds = {45, 20 + 20*i - 13, 50 + 100, 23 + 20*i};
-		Color color = WHITE;
+		Color color = BLACK;
 
 		if (V2InBounds(state->mouse_pos, bounds)) {
 			color = RED;
 		}
 
-		CDrawText(state, (HMM_Vec2){50, 20 + 20*i}, proc->name, 14, WHITE);
+		CDrawText(state, (HMM_Vec2){50, 20 + 20*i}, proc->name, 14, BLACK);
 		CDrawRectangleLines(state, bounds, color);
 	}
 }
@@ -169,4 +170,5 @@ static inline void AppStateDestroy(AppState *state) {
 
 static inline void PushCanvas(AppState *state, Canvas canvas) {
     state->canvases[state->canvas_count++] = canvas;
+    state->canvases[state->canvas_count-1].d_axis = HMM_V2(10, 10);
 }

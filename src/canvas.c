@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "util.h"
 #include "vendor/HandmadeMath.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,18 +14,33 @@ static inline void HandleInputs(AppState *state, Canvas *canvas);
 
 void CanvasUpdate(AppState *state, Canvas *canvas) {
 	HandleInputs(state, canvas);
+
+	HMM_Vec2 scale = HMM_DivV2(HMM_SubV2(canvas->screen_bounds.ZW, canvas->screen_bounds.XY), canvas->size);
+	HMM_Vec2 screen_d_axis = HMM_MulV2(scale, canvas->d_axis);
+
+	printf("%f\n", screen_d_axis.Y);
+
+	if (screen_d_axis.Y > 100) {
+		canvas->d_axis.Y /= 2;
+	}
+
+	if (screen_d_axis.Y < 25) {
+		canvas->d_axis.Y *= 2;
+	}
 }
 
 void CanvasRender(AppState *state, Canvas *canvas) {
     CDrawRectangle(state, canvas->screen_bounds, RAYWHITE);
 
-	HMM_Vec4 bounds;
-	bounds.XY = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){0, 0}), 
-			canvas->screen_bounds);
-	bounds.ZW = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){10, 10}), 
-			canvas->screen_bounds);
+	{
+		HMM_Vec4 bounds;
+		bounds.XY = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){0, 0}), 
+				canvas->screen_bounds);
+		bounds.ZW = ClampV2ToBounds(CanvasSpaceToScreenSpace(state, canvas, (HMM_Vec2){10, 10}), 
+				canvas->screen_bounds);
 
-	CDrawRectangle(state, bounds, BLACK);
+		CDrawRectangle(state, bounds, BLACK);
+	}
 
 	for (u32 i = 0; i < canvas->line_count; ++i) {
 		CanvasLine *line = &canvas->lines[i];
@@ -42,6 +58,14 @@ void CanvasRender(AppState *state, Canvas *canvas) {
 	if (canvas->index == state->selected_canvas) color = RED;
 
     CDrawRectangleLines(state, canvas->screen_bounds, color);
+
+	i32 start = FloorToI32(canvas->center.Y - canvas->size.Height/2, canvas->d_axis.Y);
+	for (i32 i = start; i < canvas->center.Y + canvas->size.Height/2; i+=canvas->d_axis.Y) {
+		HMM_Vec2 v = HMM_V2(0, i);
+		f32 y = CanvasSpaceToScreenSpace(state, canvas, v).Y;
+
+		CDrawLine(state, (HMM_Vec2[2]){HMM_V2(canvas->screen_bounds.XY.X, y), HMM_V2(canvas->screen_bounds.ZW.X, y)}, GRAY);
+	}
 }
 
 void CanvasAddLine(Canvas *canvas, HMM_Vec2 vertices[2]) {

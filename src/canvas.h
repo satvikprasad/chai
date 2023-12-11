@@ -13,6 +13,7 @@ typedef struct Canvas {
 
 	HMM_Vec2 center;
 	HMM_Vec2 size;
+	HMM_Vec2 d_axis;
 
 	CanvasLine *lines;
 	u32 line_count;

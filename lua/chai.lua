@@ -1,7 +1,6 @@
 Chai.bg = {209, 184, 157, 255}
 
 Chai.register_event(Chai.state, Chai.event_types.update, function()
-	print(os.time());
 end)
 
 Chai.add_proc(Chai.state, "Mandelbrot Set", function()
