@@ -3,18 +3,26 @@
 #include "raylib.h"
 #include "vendor/HandmadeMath.h"
 
-void CDrawRectangle(AppState *state, HMM_Vec4 bounds, Color color) {
-	if (HMM_EqV2(bounds.XY, bounds.ZW)) return;
+void CDrawLine(AppState *state, HMM_Vec2 vertices[2], Color color, b8 dotted) {
+  if (dotted) {
+    HMM_Vec2 unit = HMM_NormV2(HMM_SubV2(vertices[1], vertices[0]));
+    HMM_Vec2 l = HMM_MulV2F(unit, 5.0);
 
-	DrawRectangleRec((Rectangle){bounds.XY.X, state->window_size.Y - bounds.ZW.Y,
-			bounds.ZW.X - bounds.XY.X, bounds.ZW.Y - bounds.XY.Y},
-			color);
-}
+    for (f32 i = 0; i < HMM_LenV2(HMM_SubV2(vertices[1], vertices[0])); i+=10) {
+      CDrawLine(state, (HMM_Vec2[2]){
+          HMM_AddV2(vertices[0], HMM_MulV2F(unit, i)),
+          HMM_AddV2(vertices[0], HMM_MulV2F(unit, i+5)),
+          }, color, false);
+    }
+  } else {
+    if (HMM_EqV2(vertices[0], vertices[1])) return;
 
-void CDrawLine(AppState *state, HMM_Vec2 vertices[2], Color color) {
-	if (HMM_EqV2(vertices[0], vertices[1])) return;
-
-	DrawLine(vertices[0].X, state->window_size.Height - vertices[0].Y, vertices[1].X, state->window_size.Height - vertices[1].Y, color);
+    DrawLine(vertices[0].X, 
+        state->window_size.Height - vertices[0].Y, 
+        vertices[1].X, 
+        state->window_size.Height - vertices[1].Y, 
+        color);
+  }
 }
 
 void CDrawLineInBounds(AppState *state, HMM_Vec2 vertices[2], HMM_Vec4 bounds, Color color) {
@@ -22,67 +30,74 @@ void CDrawLineInBounds(AppState *state, HMM_Vec2 vertices[2], HMM_Vec4 bounds, C
 #define VMEW(a, b, r) ((r) - (a).Y)/((b).Y - (a).Y)
 #define INTERSECT(a, b, mew) {(mew)*(b).X + (a).X*(1-(mew)), (mew)*(b).Y + (a).Y*(1-(mew))};
 
+  f32 left_mew = HMEW(vertices[0], vertices[1], bounds.XY.X);
+  HMM_Vec2 left_intersect = INTERSECT(vertices[0], vertices[1], left_mew);
 
-	f32 left_mew = HMEW(vertices[0], vertices[1], bounds.XY.X);
-	HMM_Vec2 left_intersect = INTERSECT(vertices[0], vertices[1], left_mew);
+  f32 right_mew = HMEW(vertices[0], vertices[1], bounds.ZW.X);
+  HMM_Vec2 right_intersect = INTERSECT(vertices[0], vertices[1], right_mew);
 
-	f32 right_mew = HMEW(vertices[0], vertices[1], bounds.ZW.X);
-	HMM_Vec2 right_intersect = INTERSECT(vertices[0], vertices[1], right_mew);
+  f32 top_mew = VMEW(vertices[0], vertices[1], bounds.ZW.Y);
+  HMM_Vec2 top_intersect = INTERSECT(vertices[0], vertices[1], top_mew);
 
-	f32 top_mew = VMEW(vertices[0], vertices[1], bounds.ZW.Y);
-	HMM_Vec2 top_intersect = INTERSECT(vertices[0], vertices[1], top_mew);
+  f32 bottom_mew = VMEW(vertices[0], vertices[1], bounds.XY.Y);
+  HMM_Vec2 bottom_intersect = INTERSECT(vertices[0], vertices[1], bottom_mew);
 
-	f32 bottom_mew = VMEW(vertices[0], vertices[1], bounds.XY.Y);
-	HMM_Vec2 bottom_intersect = INTERSECT(vertices[0], vertices[1], bottom_mew);
+  for (u32 i = 0; i < 2; ++i) {
+    if (vertices[i].X < left_intersect.X) {
+      vertices[i] = left_intersect;
+    }
+    if (vertices[i].X > right_intersect.X) {
+      vertices[i] = right_intersect;
+    }
+    if (vertices[i].Y < bottom_intersect.Y) {
+      vertices[i] = bottom_intersect;
+    }
+    if (vertices[i].Y > top_intersect.Y) {
+      vertices[i] = top_intersect;
+    }
+  }
 
-	for (u32 i = 0; i < 2; ++i) {
-		if (vertices[i].X < left_intersect.X) {
-			vertices[i] = left_intersect;
-		}
-		if (vertices[i].X > right_intersect.X) {
-			vertices[i] = right_intersect;
-		}
-		if (vertices[i].Y < bottom_intersect.Y) {
-			vertices[i] = bottom_intersect;
-		}
-		if (vertices[i].Y > top_intersect.Y) {
-			vertices[i] = top_intersect;
-		}
-	}
+  if (vertices[0].X == vertices[1].X) {
+    if (vertices[0].X > bounds.ZW.X) {
+      vertices[0].X = bounds.ZW.X;
+      vertices[1].X = bounds.ZW.X;
+    }
 
-	if (vertices[0].X == vertices[1].X) {
-		if (vertices[0].X > bounds.ZW.X) {
-			vertices[0].X = bounds.ZW.X;
-			vertices[1].X = bounds.ZW.X;
-		}
+    if (vertices[0].X < bounds.XY.X) {
+      vertices[0].X = bounds.XY.X;
+      vertices[1].X = bounds.XY.X;
+    }
+  }
 
-		if (vertices[0].X < bounds.XY.X) {
-			vertices[0].X = bounds.XY.X;
-			vertices[1].X = bounds.XY.X;
-		}
-	}
+  if (vertices[0].Y == vertices[1].Y) {
+    if (vertices[0].Y > bounds.ZW.Y) {
+      vertices[0].Y = bounds.ZW.Y;
+      vertices[1].Y = bounds.ZW.Y;
+    }
 
-	if (vertices[0].Y == vertices[1].Y) {
-		if (vertices[0].Y > bounds.ZW.Y) {
-			vertices[0].Y = bounds.ZW.Y;
-			vertices[1].Y = bounds.ZW.Y;
-		}
+    if (vertices[0].Y < bounds.XY.Y) {
+      vertices[0].Y = bounds.XY.Y;
+      vertices[1].Y = bounds.XY.Y;
+    }
+  }
 
-		if (vertices[0].Y < bounds.XY.Y) {
-			vertices[0].Y = bounds.XY.Y;
-			vertices[1].Y = bounds.XY.Y;
-		}
-	}
-
-	CDrawLine(state, vertices, color);
+  CDrawLine(state, vertices, color, false);
 }
 
-void CDrawRectangleLines(AppState *state, HMM_Vec4 bounds, Color color) {
-	DrawRectangleLines(bounds.XY.X, state->window_size.Y - bounds.ZW.Y, bounds.ZW.X - bounds.XY.X,
-			bounds.ZW.Y - bounds.XY.Y, color);
+void CDrawRectangle(AppState *state, HMM_Vec4 bounds, Color color, b8 lines) {
+  if (lines) {
+    DrawRectangleLines(bounds.XY.X, state->window_size.Y - bounds.ZW.Y, bounds.ZW.X - bounds.XY.X,
+        bounds.ZW.Y - bounds.XY.Y, color);
+  } else {
+    if (HMM_EqV2(bounds.XY, bounds.ZW)) return;
+
+    DrawRectangleRec((Rectangle){bounds.XY.X, state->window_size.Y - bounds.ZW.Y,
+        bounds.ZW.X - bounds.XY.X, bounds.ZW.Y - bounds.XY.Y},
+        color);
+  }
 }
 
 
 void CDrawText(AppState *state, HMM_Vec2 position, const char *text, u32 font_size, Color color) {
-	DrawTextEx(state->font, text, (Vector2){position.X, state->window_size.Height - position.Y}, font_size, 1, color);
+  DrawTextEx(state->font, text, (Vector2){position.X, state->window_size.Height - position.Y}, font_size, 1, color);
 }
